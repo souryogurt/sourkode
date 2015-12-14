@@ -13,10 +13,14 @@
 #pragma warning( pop )
 #pragma warning( disable: 4710 )
 #endif /* _MSC_VER */
-
+#define UNUSED(x) (void)(x)
 
 int CALLBACK WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                       LPSTR lpCmdLine, int nCmdShow)
 {
+    UNUSED (hInstance);
+    UNUSED (hPrevInstance);
+    UNUSED (lpCmdLine);
+    UNUSED (nCmdShow);
     return kdMain (__argc, (const KDchar * const *)__argv);
 }
