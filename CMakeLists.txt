@@ -1,0 +1,38 @@
+project (sourkode C)
+cmake_minimum_required(VERSION 2.8.9)
+
+set(SOURKODE_VERSION_MAJOR "0")
+set(SOURKODE_VERSION_MINOR "1")
+set(SOURKODE_VERSION "${SOURKODE_VERSION_MAJOR}.${SOURKODE_VERSION_MINOR}")
+
+option(NINJA_MODE "Enable all warnings" ON)
+list(APPEND SOURKODE_INCLUDE_DIRS "inc")
+
+option(USE_STANDARD_LIBRARY "Use standard C library" ON)
+if (WIN32)
+    option(USE_ENTRY_WINMAIN "Use WinMain as entry point" ON)
+endif()
+
+if(USE_ENTRY_WINMAIN)
+    list(APPEND SOURKODE_SOURCES "src/entry_winmain.c")
+elseif(USE_STANDARD_LIBRARY)
+    list(APPEND SOURKODE_SOURCES "src/entry_main.c")
+endif()
+
+if(NINJA_MODE)
+    if (CMAKE_C_COMPILER_ID MATCHES "^GNU$")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c89 -pedantic -Wall -Wextra -Wformat-nonliteral -Wformat-security -Wformat-y2k -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wsync-nand -Wstrict-overflow=5 -Wtrampolines -Wfloat-equal -Wdeclaration-after-statement -Wundef -Wshadow -Wunsafe-loop-optimizations -Wbad-function-cast -Wc++-compat -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wsign-conversion -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wnormalized=nfc -Wredundant-decls -Wnested-externs -Winline -Wvla -Wdisabled-optimization -Wmissing-prototypes -Wmissing-declarations")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "^MSVC$")
+        if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
+            string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+        else()
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall")
+        endif()
+    elseif(CMAKE_C_COMPILER_ID MATCHES "^Clang$")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c89 -pedantic -Weverything")
+    endif()
+endif()
+
+include_directories(${SOURKODE_INCLUDE_DIRS})
+add_library(${CMAKE_PROJECT_NAME} STATIC ${SOURKODE_SOURCES} ${SOURKODE_HEADERS})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${SOURKODE_LIBRARIES})
