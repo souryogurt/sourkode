@@ -1,24 +1,25 @@
 project (sourkode C)
 cmake_minimum_required(VERSION 2.8.9)
 
-set(SOURKODE_VERSION_MAJOR "0")
-set(SOURKODE_VERSION_MINOR "1")
-set(SOURKODE_VERSION "${SOURKODE_VERSION_MAJOR}.${SOURKODE_VERSION_MINOR}")
+
+list(APPEND SOURKODE_INCLUDE_DIRS "inc")
+option(WITHOUT_STANDARD_C_LIBRARY "Do not use standard C library" OFF)
+option(WITH_WINDOWING "Windowing supported" OFF)
+
+if(WITHOUT_STANDARD_C_LIBRARY)
+	add_definitions(-DNO_STANDARD_C_LIBRARY)
+endif()
+if(WITH_WINDOWING)
+	add_definitions(-DKD_WINDOW_SUPPORTED)
+endif()
+
+if(WIN32)
+	list(APPEND SOURKODE_SOURCES "src/entry_winmain.c")
+else()
+	list(APPEND SOURKODE_SOURCES "src/entry_main.c")
+endif()
 
 option(NINJA_MODE "Enable all warnings" ON)
-list(APPEND SOURKODE_INCLUDE_DIRS "inc")
-
-option(USE_STANDARD_LIBRARY "Use standard C library" ON)
-if (WIN32)
-    option(USE_ENTRY_WINMAIN "Use WinMain as entry point" ON)
-endif()
-
-if(USE_ENTRY_WINMAIN)
-    list(APPEND SOURKODE_SOURCES "src/entry_winmain.c")
-elseif(USE_STANDARD_LIBRARY)
-    list(APPEND SOURKODE_SOURCES "src/entry_main.c")
-endif()
-
 if(NINJA_MODE)
     if (CMAKE_C_COMPILER_ID MATCHES "^GNU$")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c89 -pedantic -Wall -Wextra -Wformat-nonliteral -Wformat-security -Wformat-y2k -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wsync-nand -Wstrict-overflow=5 -Wtrampolines -Wfloat-equal -Wdeclaration-after-statement -Wundef -Wshadow -Wunsafe-loop-optimizations -Wbad-function-cast -Wc++-compat -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wsign-conversion -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wnormalized=nfc -Wredundant-decls -Wnested-externs -Winline -Wvla -Wdisabled-optimization -Wmissing-prototypes -Wmissing-declarations")
