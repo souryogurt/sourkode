@@ -1,6 +1,7 @@
 set (sourkode_HEADERS "${SOURKODE_SOURCE_DIR}/inc/KD/kd.h" 
 					"${SOURKODE_SOURCE_DIR}/inc/KD/kdplatform.h")
 if(WIN32)
+
 	list(APPEND sourkode_SOURCES "entry_winmain.c")
 else()
 	list(APPEND sourkode_SOURCES "entry_main.c")
@@ -16,7 +17,9 @@ set_target_properties(sourkode PROPERTIES
     VERSION ${SOURKODE_VERSION}
     SOVERSION ${SOURKODE_VERSION_MAJOR}
     FOLDER "sourkode")
-
+if(WIN32)
+	target_compile_definitions(sourkode PRIVATE -DUNICODE -D_UNICODE)
+endif()
 if(WITHOUT_STANDARD_C_LIBRARY)
 	target_compile_definitions(sourkode PRIVATE -DNO_STANDARD_C_LIBRARY)
 endif()
