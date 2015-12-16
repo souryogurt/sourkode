@@ -1,25 +1,21 @@
-project (sourkode C)
+project (SOURKODE C)
 cmake_minimum_required(VERSION 2.8.9)
 
+set(SOURKODE_VERSION_MAJOR "0")
+set(SOURKODE_VERSION_MINOR "1")
+set(SOURKODE_VERSION_PATCH "0")
+set(SOURKODE_VERSION_EXTRA "")
+set(SOURKODE_VERSION "${SOURKODE_VERSION_MAJOR}.${SOURKODE_VERSION_MINOR}")
+set(SOURKODE_VERSION_FULL "${SOURKODE_VERSION}.${SOURKODE_VERSION_PATCH}${SOURKODE_VERSION_EXTRA}")
 
-list(APPEND SOURKODE_INCLUDE_DIRS "inc")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+#===================== Options list ===========================================
 option(WITHOUT_STANDARD_C_LIBRARY "Do not use standard C library" OFF)
 option(WITH_WINDOWING "Windowing supported" OFF)
-
-if(WITHOUT_STANDARD_C_LIBRARY)
-	add_definitions(-DNO_STANDARD_C_LIBRARY)
-endif()
-if(WITH_WINDOWING)
-	add_definitions(-DKD_WINDOW_SUPPORTED)
-endif()
-
-if(WIN32)
-	list(APPEND SOURKODE_SOURCES "src/entry_winmain.c")
-else()
-	list(APPEND SOURKODE_SOURCES "src/entry_main.c")
-endif()
-
 option(NINJA_MODE "Enable all warnings" ON)
+
+#===================== Set compiler flags =====================================
 if(NINJA_MODE)
     if (CMAKE_C_COMPILER_ID MATCHES "^GNU$")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c89 -pedantic -Wall -Wextra -Wformat-nonliteral -Wformat-security -Wformat-y2k -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wsync-nand -Wstrict-overflow=5 -Wtrampolines -Wfloat-equal -Wdeclaration-after-statement -Wundef -Wshadow -Wunsafe-loop-optimizations -Wbad-function-cast -Wc++-compat -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wsign-conversion -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wnormalized=nfc -Wredundant-decls -Wnested-externs -Winline -Wvla -Wdisabled-optimization -Wmissing-prototypes -Wmissing-declarations")
@@ -34,6 +30,43 @@ if(NINJA_MODE)
     endif()
 endif()
 
-include_directories(${SOURKODE_INCLUDE_DIRS})
-add_library(${CMAKE_PROJECT_NAME} STATIC ${SOURKODE_SOURCES} ${SOURKODE_HEADERS})
-target_link_libraries(${CMAKE_PROJECT_NAME} ${SOURKODE_LIBRARIES})
+
+#===================== Find all dependencies ==================================
+set(sourkode_LIBRARIES "") # should contain just list of libs
+set(sourkode_PKG_LIBS "") # Should contain list of -lLIBNAME
+set(sourkode_PKG_DEPS "") #list of dependencies names for pkg-config
+set(sourkode_INCLUDE_DIRS "") # Should contain list of all include dirs required to build library
+
+
+#===================== Export library dependencies ============================
+set(SOURKODE_LIBRARIES ${sourkode_LIBRARIES} CACHE STRING "Dependencies of SOURKODE")
+foreach(arg ${sourkode_PKG_DEPS})
+    set(SOURKODE_PKG_DEPS "${SOURKODE_PKG_DEPS} ${arg}")
+endforeach()
+foreach(arg ${sourkode_PKG_LIBS})
+    set(SOURKODE_PKG_LIBS "${SOURKODE_PKG_LIBS} ${arg}")
+endforeach()
+
+#==================== Create generated files ==================================
+include(CMakePackageConfigHelpers)
+
+if (UNIX)
+    set(SOURKODE_CONFIG_PATH "${CMAKE_INSTALL_PREFIX}/lib/cmake/sourkode/")
+else()
+    set(SOURKODE_CONFIG_PATH "${CMAKE_INSTALL_PREFIX}/")
+endif()
+
+configure_package_config_file("${SOURKODE_SOURCE_DIR}/src/sourkodeConfig.cmake.in"
+                              "${SOURKODE_BINARY_DIR}/src/sourkodeConfig.cmake"
+                              INSTALL_DESTINATION "${SOURKODE_CONFIG_PATH}"
+                              PATH_VARS CMAKE_INSTALL_PREFIX
+                              NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+
+write_basic_package_version_file("${SOURKODE_BINARY_DIR}/src/sourkodeConfigVersion.cmake" 
+							    VERSION ${SOURKODE_VERSION_FULL}
+                                 COMPATIBILITY SameMajorVersion)
+
+configure_file("${SOURKODE_SOURCE_DIR}/src/sourkode.pc.in"
+               "${SOURKODE_BINARY_DIR}/src/sourkode.pc" @ONLY)
+
+add_subdirectory(src)

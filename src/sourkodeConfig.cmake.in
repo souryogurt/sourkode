@@ -1,0 +1,14 @@
+# - Config file for the sourkode package
+# It defines the following variables
+#   SOURKODE_INCLUDE_DIR, the path where SOURKODE headers are located
+#   SOURKODE_LIBRARY_DIR, folder in which the SOURKODE library is located
+#   SOURKODE_LIBRARY, library to link against to use SOURKODE
+
+set(SOURKODE_VERSION "@SOURKODE_VERSION_FULL@")
+
+@PACKAGE_INIT@
+
+set_and_check(SOURKODE_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_PREFIX@/inc")
+set_and_check(SOURKODE_LIBRARY_DIR "@PACKAGE_CMAKE_INSTALL_PREFIX@/lib")
+
+find_library(SOURKODE_LIBRARY "@SOURKODE_LIB_NAME@" HINTS ${SOURKODE_LIBRARY_DIR})
