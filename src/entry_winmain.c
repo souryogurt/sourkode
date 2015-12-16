@@ -41,12 +41,13 @@ int wmain (int argc, wchar_t *wargv[ ], wchar_t *envp[])
 {
 #endif
     int result = 0;
+    int i = 0;
     char **argvu8 = (char **) kdMalloc (sizeof (char *) * argc);
-    for (int i = 0; i < argc; i++) {
+    for (i = 0; i < argc; i++) {
         argvu8[i] = get_utf8 (wargv[i]);
     }
     result = kdMain (argc, (const KDchar * const *)argvu8);
-    for (int i = 0; i < argc; i++) {
+    for (i = 0; i < argc; i++) {
         kdFree (argvu8[i]);
     }
     kdFree (argvu8);
