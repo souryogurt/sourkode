@@ -7,12 +7,13 @@
 #endif /* _MSC_VER */
 #include <KD/kd.h>
 #include <windows.h>
+#include <tchar.h>
 #ifdef _MSC_VER
 #pragma warning( pop )
 #pragma warning( disable: 4710 )
 #endif /* _MSC_VER */
-#define UNUSED(x) (void)(x)
 
+#ifdef  _UNICODE
 /** Convert UTF16 string to UTF8 string
  * @param utf16_string UTF16 string terminated by 0
  * @returns new UTF8 string, KD_NULL otherwise
@@ -72,15 +73,22 @@ static void free_utf8_array (KDchar **strings, int count)
         kdFree (strings);
     }
 }
+#endif
 
-int wmain (int argc, wchar_t *wargv[ ], wchar_t *envp[])
+int _tmain (int argc, _TCHAR *argt[])
 {
     int result = 1;
-    KDchar **argv = get_utf8_array (wargv, argc);
-    UNUSED (envp);
+    KDchar **argv = KD_NULL;
+#ifdef  _UNICODE
+    argv = get_utf8_array (argt, argc);
+#else
+    argv = (KDChar **) argt;
+#endif
     if (argv) {
         result = kdMain (argc, argv);
-        free_utf8_array (argv, argc);
     }
+#ifdef  _UNICODE
+    free_utf8_array (argv, argc);
+#endif
     return result;
 }
