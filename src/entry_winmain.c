@@ -15,18 +15,18 @@
 
 /** Convert UTF16 string to UTF8 string
  * @param utf16_string UTF16 string terminated by 0
- * @returns new UTF8 string, NULL otherwise
+ * @returns new UTF8 string, KD_NULL otherwise
  */
-static char *get_utf8 (LPCWSTR utf16_string)
+static KDchar *get_utf8 (LPCWSTR utf16_string)
 {
-    char *result = NULL;
+    KDchar *result = KD_NULL;
     if (utf16_string) {
         int result_length = WideCharToMultiByte (CP_UTF8, WC_ERR_INVALID_CHARS,
-                            utf16_string, -1, result, 0, NULL, NULL);
-        result = (char *) kdMalloc (sizeof (char) * result_length);
+                            utf16_string, -1, result, 0, 0, 0);
+        result = (KDchar *) kdMalloc (sizeof (KDchar) * result_length);
         if (result) {
             WideCharToMultiByte (CP_UTF8, WC_ERR_INVALID_CHARS, utf16_string, -1, result,
-                                 result_length, NULL, NULL);
+                                 result_length, 0, 0);
         }
     }
     return result;
@@ -35,20 +35,20 @@ static char *get_utf8 (LPCWSTR utf16_string)
 /** Convert array of UTF16 strings to array of UTF8 strings
  * @param strings Array of UTF16 strings
  * @param count Number of elements of array
- * @returns new array of UTF8 strings, NULL otherwise
+ * @returns new array of UTF8 strings, KD_NULL otherwise
  */
-static char **get_utf8_array (wchar_t **strings, int count)
+static KDchar **get_utf8_array (const LPCWSTR *strings, int count)
 {
-    char **result = NULL;
+    KDchar **result = KD_NULL;
     if (strings && (count > 0)) {
-        result = (char **) kdMalloc (sizeof (char *) * count);
+        result = (KDchar **) kdMalloc (sizeof (KDchar *) * count);
         if (result) {
             int i = 0;
             while (i < count) {
                 result[i] = get_utf8 (strings[i]);
-                if (result[i] == NULL) {
+                if (result[i] == KD_NULL) {
                     kdFree (result);
-                    return NULL;
+                    return KD_NULL;
                 }
                 i++;
             }
@@ -61,7 +61,7 @@ static char **get_utf8_array (wchar_t **strings, int count)
  * @param strings Array of strings
  * @param count Number of elements of array
  */
-static void free_utf8_array (char **strings, int count)
+static void free_utf8_array (KDchar **strings, int count)
 {
     if (strings) {
         int i = 0;
@@ -76,10 +76,10 @@ static void free_utf8_array (char **strings, int count)
 int wmain (int argc, wchar_t *wargv[ ], wchar_t *envp[])
 {
     int result = 1;
-    char **argv = get_utf8_array (wargv, argc);
+    KDchar **argv = get_utf8_array (wargv, argc);
     UNUSED (envp);
     if (argv) {
-        result = kdMain (argc, (const KDchar * const *)argv);
+        result = kdMain (argc, argv);
         free_utf8_array (argv, argc);
     }
     return result;
