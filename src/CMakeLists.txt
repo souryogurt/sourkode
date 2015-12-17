@@ -7,6 +7,7 @@ else()
 endif()
 
 list(APPEND sourkode_SOURCES "memalloc_stdlib.c")
+list(APPEND sourkode_SOURCES "threading_no.c")
 
 if (APPLE)
     # For some reason, CMake doesn't know about .m
