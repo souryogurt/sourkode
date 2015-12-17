@@ -11,8 +11,6 @@ set(SOURKODE_VERSION_FULL "${SOURKODE_VERSION}.${SOURKODE_VERSION_PATCH}${SOURKO
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #===================== Options list ===========================================
-option(WITHOUT_STANDARD_C_LIBRARY "Do not use standard C library" OFF)
-option(WITH_WINDOWING "Windowing supported" OFF)
 option(NINJA_MODE "Enable all warnings" ON)
 
 #===================== Set compiler flags =====================================

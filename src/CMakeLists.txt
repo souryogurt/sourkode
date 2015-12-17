@@ -16,17 +16,7 @@ endif()
 add_library(sourkode STATIC ${sourkode_SOURCES} ${sourkode_HEADERS})
 set_target_properties(sourkode PROPERTIES
     VERSION ${SOURKODE_VERSION}
-    SOVERSION ${SOURKODE_VERSION_MAJOR}
-    FOLDER "sourkode")
-if(WIN32)
-	target_compile_definitions(sourkode PRIVATE -DUNICODE -D_UNICODE)
-endif()
-if(WITHOUT_STANDARD_C_LIBRARY)
-	target_compile_definitions(sourkode PRIVATE -DNO_STANDARD_C_LIBRARY)
-endif()
-if(WITH_WINDOWING)
-	target_compile_definitions(sourkode PRIVATE -DKD_WINDOW_SUPPORTED)
-endif()
+    SOVERSION ${SOURKODE_VERSION_MAJOR})
 
 target_include_directories(sourkode PRIVATE "${SOURKODE_SOURCE_DIR}/inc" ${sourkode_INCLUDE_DIRS})
 
