@@ -19,6 +19,7 @@ set_target_properties(sourkode PROPERTIES
     SOVERSION ${SOURKODE_VERSION_MAJOR})
 
 target_include_directories(sourkode PRIVATE "${SOURKODE_SOURCE_DIR}/inc" ${sourkode_INCLUDE_DIRS})
+target_compile_definitions(sourkode PUBLIC UNICODE _UNICODE)
 
 # HERE I CAN SET NINJA FLAGS ACTUALLY
 #target_compile_options(sourkode PRIVATE
