@@ -1,5 +1,6 @@
 set (sourkode_HEADERS "${SOURKODE_SOURCE_DIR}/inc/KD/kd.h" 
-					"${SOURKODE_SOURCE_DIR}/inc/KD/kdplatform.h")
+					"${SOURKODE_SOURCE_DIR}/inc/KD/kdplatform.h"
+                    "${SOURKODE_SOURCE_DIR}/inc/KD/KHR_thread_storage.h")
 if(WIN32)
 	list(APPEND sourkode_SOURCES "entry_winmain.c")
 else()
@@ -8,6 +9,7 @@ endif()
 
 list(APPEND sourkode_SOURCES "memalloc_stdlib.c")
 list(APPEND sourkode_SOURCES "threading_no.c")
+list(APPEND sourkode_SOURCES "thread_storage_no.c")
 
 if (APPLE)
     # For some reason, CMake doesn't know about .m
