@@ -1,4 +1,6 @@
 #include <KD/kd.h>
+#include <KD/KHR_thread_storage.h>
+#include "sk_thread_data.h"
 
 struct KDThreadAttr {
     KDint detachstate;
@@ -211,4 +213,19 @@ KD_API KDint KD_APIENTRY kdThreadSemPost (KDThreadSem *sem)
 {
     sem->value += 1;
     return 0;
+}
+
+KD_API void KD_APIENTRY skInitThreadData (KDThread *thread)
+{
+    KDThreadStorageKeyKHR current_key = kdMapThreadStorageKHR (SKCurrentThread);
+    SKThreadData *data = (SKThreadData *) kdMalloc (sizeof (SKThreadData));
+    data->error = 0;
+    if (!thread) {
+        /* It's main thread */
+        kdSetThreadStorageKHR ( kdMapThreadStorageKHR (SKMainThread), data);
+        thread = (KDThread *) kdMalloc (sizeof (KDThread));
+        /* TODO: set internal implementation defined handles */
+    }
+    data->thread = thread;
+    kdSetThreadStorageKHR (current_key, data);
 }

@@ -6,6 +6,7 @@
 #pragma warning( disable: 4820 )
 #endif /* _MSC_VER */
 #include <KD/kd.h>
+#include "sk_thread_data.h"
 #include <windows.h>
 #ifdef _MSC_VER
 #pragma warning( pop )
@@ -80,10 +81,16 @@ int main (int argc, char *argt[])
     LPWSTR *argw = CommandLineToArgvW (GetCommandLineW(), &argc);
     KDchar **argv = get_utf8_array (argw, argc);
     UNUSED (argt);
+    skInitThreadData (KD_NULL);
     if (argw && argv) {
         result = kdMain (argc, argv);
     }
     free_utf8_array (argv, argc);
     LocalFree (argw);
     return result;
+}
+
+KD_API KD_NORETURN void KD_APIENTRY kdExit (KDint status)
+{
+    ExitProcess (status);
 }
