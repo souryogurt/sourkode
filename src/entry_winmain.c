@@ -7,7 +7,6 @@
 #endif /* _MSC_VER */
 #include <KD/kd.h>
 #include <windows.h>
-#include <tchar.h>
 #ifdef _MSC_VER
 #pragma warning( pop )
 #pragma warning( disable: 4710 )
@@ -18,15 +17,16 @@
  * @param utf16_string UTF16 string terminated by 0
  * @returns new UTF8 string, KD_NULL otherwise
  */
-static KDchar *get_utf8 (LPCWSTR utf16_string)
+static KDchar *get_utf8 (const wchar_t *const utf16_string)
 {
     KDchar *result = KD_NULL;
     if (utf16_string) {
         int result_length = WideCharToMultiByte (CP_UTF8, WC_ERR_INVALID_CHARS,
-                            utf16_string, -1, result, 0, 0, 0);
+                            (LPCWCH)utf16_string, -1, result, 0, 0, 0);
         result = (KDchar *) kdMalloc (sizeof (KDchar) * result_length);
         if (result) {
-            WideCharToMultiByte (CP_UTF8, WC_ERR_INVALID_CHARS, utf16_string, -1, result,
+            WideCharToMultiByte (CP_UTF8, WC_ERR_INVALID_CHARS, (LPCWCH)utf16_string, -1,
+                                 result,
                                  result_length, 0, 0);
         }
     }
@@ -38,7 +38,7 @@ static KDchar *get_utf8 (LPCWSTR utf16_string)
  * @param count Number of elements of array
  * @returns new array of UTF8 strings, KD_NULL otherwise
  */
-static KDchar **get_utf8_array (const LPCWSTR *strings, int count)
+static KDchar **get_utf8_array (const wchar_t *const *const strings, int count)
 {
     KDchar **result = KD_NULL;
     if (strings && (count > 0)) {
@@ -75,12 +75,12 @@ static void free_utf8_array (KDchar **strings, int count)
 }
 #endif
 
-int _tmain (int argc, _TCHAR *argt[])
+int main (int argc, char *argt[])
 {
     int result = 1;
     KDchar **argv = KD_NULL;
 #ifdef  _UNICODE
-    argv = get_utf8_array (argt, argc);
+    argv = get_utf8_array ((wchar_t **)argt, argc);
 #else
     argv = (KDChar **) argt;
 #endif
