@@ -11,13 +11,13 @@
 #pragma warning( pop )
 #pragma warning( disable: 4710 )
 #endif /* _MSC_VER */
+#define UNUSED(x) (void)(x)
 
-#ifdef  _UNICODE
 /** Convert UTF16 string to UTF8 string
  * @param utf16_string UTF16 string terminated by 0
  * @returns new UTF8 string, KD_NULL otherwise
  */
-static KDchar *get_utf8 (const wchar_t *const utf16_string)
+static KDchar *get_utf8 (const WCHAR *const utf16_string)
 {
     KDchar *result = KD_NULL;
     if (utf16_string) {
@@ -38,7 +38,7 @@ static KDchar *get_utf8 (const wchar_t *const utf16_string)
  * @param count Number of elements of array
  * @returns new array of UTF8 strings, KD_NULL otherwise
  */
-static KDchar **get_utf8_array (const wchar_t *const *const strings, int count)
+static KDchar **get_utf8_array (const WCHAR *const *const strings, int count)
 {
     KDchar **result = KD_NULL;
     if (strings && (count > 0)) {
@@ -73,22 +73,17 @@ static void free_utf8_array (KDchar **strings, int count)
         kdFree (strings);
     }
 }
-#endif
 
 int main (int argc, char *argt[])
 {
     int result = 1;
-    KDchar **argv = KD_NULL;
-#ifdef  _UNICODE
-    argv = get_utf8_array ((wchar_t **)argt, argc);
-#else
-    argv = (KDChar **) argt;
-#endif
-    if (argv) {
+    LPWSTR *argw = CommandLineToArgvW (GetCommandLineW(), &argc);
+    KDchar **argv = get_utf8_array (argw, argc);
+    UNUSED (argt);
+    if (argw && argv) {
         result = kdMain (argc, argv);
     }
-#ifdef  _UNICODE
     free_utf8_array (argv, argc);
-#endif
+    LocalFree (argw);
     return result;
 }
