@@ -5,15 +5,77 @@
 #define KD_API
 #define KD_APIENTRY
 
-typedef int KDint32;
-typedef unsigned int KDuint32;
-typedef long long KDint64;
-typedef unsigned long long KDuint64;
-typedef short KDint16;
-typedef unsigned short KDuint16;
-typedef unsigned long KDuintptr;
-typedef unsigned long KDsize;
-typedef long KDssize;
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__GNUC__) || defined(__SCO__) || defined(__USLC__)
+/*
+ * Using <stdint.h>
+ */
+#include <stdint.h>
+typedef int32_t                 KDint32;
+typedef uint32_t                KDuint32;
+typedef int64_t                 KDint64;
+typedef uint64_t                KDuint64;
+#elif defined(__VMS ) || defined(__sgi)
+/*
+ * Using <inttypes.h>
+ */
+#include <inttypes.h>
+typedef int32_t                 KDint32;
+typedef uint32_t                KDuint32;
+typedef int64_t                 KDint64;
+typedef uint64_t                KDuint64;
+#elif defined(_WIN32) && !defined(__SCITECH_SNAP__)
+/*
+ * Win32
+ */
+typedef __int32                 KDint32;
+typedef unsigned __int32        KDuint32;
+typedef __int64                 KDint64;
+typedef unsigned __int64        KDuint64;
+#elif defined(__sun__) || defined(__digital__)
+/*
+ * Sun or Digital
+ */
+typedef int                     KDint32;
+typedef unsigned int            KDuint32;
+#if defined(__arch64__) || defined(_LP64)
+typedef long int                KDint64;
+typedef unsigned long int       KDuint64;
+#else
+typedef long long int           KDint64;
+typedef unsigned long long int  KDuint64;
+#endif /* __arch64__ */
+#else
+/*
+ * Generic fallback
+ */
+#include <stdint.h>
+typedef int32_t                 KDint32;
+typedef uint32_t                KDuint32;
+typedef int64_t                 KDint64;
+typedef uint64_t                KDuint64;
+#endif
+
+/*
+ * Types that are (so far) the same on all platforms
+ */
+typedef signed   short int KDint16;
+typedef unsigned short int KDuint16;
+
+/*
+ * Types that differ between LLP64 and LP64 architectures - in LLP64,
+ * pointers are 64 bits, but 'long' is still 32 bits. Win64 appears
+ * to be the only LLP64 architecture in current use.
+ */
+#ifdef _WIN64
+typedef unsigned long long int KDuintptr;
+typedef unsigned long long int KDsize;
+typedef signed   long long int KDssize;
+#else
+typedef unsigned long int KDuintptr;
+typedef unsigned long int KDsize;
+typedef signed   long int KDssize;
+#endif
+
 #define KDINT_MIN (-0x7fffffff-1)
 #define KDINT_MAX 0x7fffffff
 #define KDUINT_MAX 0xffffffffU
@@ -33,4 +95,3 @@ typedef long KDssize;
 #endif
 
 #endif /* __kdplatform_h_ */
-
